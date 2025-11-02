@@ -110,7 +110,7 @@ export default {
   font-size: 1.2rem;
 }
 .btn-close-custom {
-  color: red; /* Coloque a cor que quiser aqui */
+  color: red; 
   font-size: 1.7rem;
   background: transparent;
   border: none;
