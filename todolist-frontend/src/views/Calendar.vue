@@ -86,14 +86,13 @@
     </div>
   </div>
 </template>
-
 <script>
-import axios from 'axios';
-import BaseModal from '@/components/BaseModal.vue';
-import TaskCard from '@/components/TaskCard.vue';
+import api from "@/api";
+import BaseModal from "@/components/BaseModal.vue";
+import TaskCard from "@/components/TaskCard.vue";
 
 export default {
-  name: 'Calendar',
+  name: "Calendar",
   components: { BaseModal, TaskCard },
   data() {
     const now = new Date();
@@ -101,7 +100,7 @@ export default {
       currentYear: now.getFullYear(),
       currentMonth: now.getMonth(),
       isMobile: window.innerWidth < 768,
-      daysOfWeek: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+      daysOfWeek: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
       tasks: [],
       showModal: false,
       selectedDate: null,
@@ -109,22 +108,25 @@ export default {
   },
   computed: {
     selectedDateFormatted() {
-      return this.selectedDate ? this.formatDate(this.selectedDate) : '';
+      return this.selectedDate ? this.formatDate(this.selectedDate) : "";
     },
     tasksForSelectedDate() {
       if (!this.selectedDate) return [];
       const formatted = this.formatDate(this.selectedDate);
-      return this.tasks.filter(task => task.due_date === formatted);
+      return this.tasks.filter((task) => task.due_date === formatted);
     },
   },
   methods: {
-    fetchTasks() {
-      axios.get('http://127.0.0.1:8000/api/tasks')
-        .then(res => { this.tasks = res.data; })
-        .catch(err => { console.error('Erro ao buscar tarefas:', err); });
+    async fetchTasks() {
+      try {
+        const res = await api.get("/tasks");
+        this.tasks = res.data;
+      } catch (err) {
+        console.error("Erro ao buscar tarefas:", err);
+      }
     },
     monthName(monthIndex) {
-      return new Date(this.currentYear, monthIndex).toLocaleString('pt-BR', { month: 'long' });
+      return new Date(this.currentYear, monthIndex).toLocaleString("pt-BR", { month: "long" });
     },
     getDaysInMonth(year, month) {
       const days = [];
@@ -142,38 +144,39 @@ export default {
       return [...blanks, ...daysInMonth];
     },
     formatDate(date) {
-      const d = String(date.getDate()).padStart(2, '0');
-      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, "0");
+      const m = String(date.getMonth() + 1).padStart(2, "0");
       const y = date.getFullYear();
       return `${d}/${m}/${y}`;
     },
     getDayClass(day) {
-      if (!day) return 'empty-day';
+      if (!day) return "empty-day";
       const formattedDay = this.formatDate(day);
-      const today = new Date(); today.setHours(0,0,0,0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-      const tasksForDay = this.tasks?.filter(task => task.due_date === formattedDay) || [];
-      if (tasksForDay.length === 0) return '';
+      const tasksForDay = this.tasks?.filter((task) => task.due_date === formattedDay) || [];
+      if (tasksForDay.length === 0) return "";
 
-      const hasOverdue = tasksForDay.some(task => {
-        const [d,m,y] = task.due_date.split('/');
+      const hasOverdue = tasksForDay.some((task) => {
+        const [d, m, y] = task.due_date.split("/");
         const taskDate = new Date(+y, +m - 1, +d);
         return !task.completed && taskDate < today;
       });
-      const hasPendingOnTime = tasksForDay.some(task => {
-        const [d,m,y] = task.due_date.split('/');
+      const hasPendingOnTime = tasksForDay.some((task) => {
+        const [d, m, y] = task.due_date.split("/");
         const taskDate = new Date(+y, +m - 1, +d);
         return !task.completed && taskDate >= today;
       });
 
-      if (hasOverdue) return 'has-task bg-danger text-white rounded-circle';
-      if (hasPendingOnTime) return 'has-task bg-yellow text-white rounded-circle';
-      return 'has-task bg-success text-white rounded-circle';
+      if (hasOverdue) return "has-task bg-danger text-white rounded-circle";
+      if (hasPendingOnTime) return "has-task bg-yellow text-white rounded-circle";
+      return "has-task bg-success text-white rounded-circle";
     },
     handleDayClick(day) {
       if (!day) return;
       const formatted = this.formatDate(day);
-      const tasks = this.tasks.filter(task => task.due_date === formatted);
+      const tasks = this.tasks.filter((task) => task.due_date === formatted);
       if (tasks.length > 0) {
         this.selectedDate = day;
         this.showModal = true;
@@ -182,7 +185,10 @@ export default {
     prevPeriod() {
       if (this.isMobile) {
         this.currentMonth--;
-        if (this.currentMonth < 0) { this.currentMonth = 11; this.currentYear--; }
+        if (this.currentMonth < 0) {
+          this.currentMonth = 11;
+          this.currentYear--;
+        }
       } else {
         this.currentYear--;
       }
@@ -190,11 +196,14 @@ export default {
     nextPeriod() {
       if (this.isMobile) {
         this.currentMonth++;
-        if (this.currentMonth > 11) { this.currentMonth = 0; this.currentYear++; }
+        if (this.currentMonth > 11) {
+          this.currentMonth = 0;
+          this.currentYear++;
+        }
       } else {
         this.currentYear++;
       }
-    }
+    },
   },
   mounted() {
     this.fetchTasks();
