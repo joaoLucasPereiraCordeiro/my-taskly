@@ -9,7 +9,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import 'bootstrap/dist/js/bootstrap.bundle.min.js' // <— necessário para Offcanvas, Dropdowns etc.
 
 // 🔧 Define a URL base da sua API Laravel
-axios.defaults.baseURL = "http://localhost:8000";
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 // 🔐 Se houver token salvo, define o Authorization automaticamente
 const token = secureStorage.getItem("token");
