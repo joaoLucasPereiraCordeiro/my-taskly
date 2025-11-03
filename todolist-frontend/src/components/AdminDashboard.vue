@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import api from "@/api"; // usa a instância axios configurada com baseURL e token
+import api from '@/services/api';
 
 export default {
   data() {

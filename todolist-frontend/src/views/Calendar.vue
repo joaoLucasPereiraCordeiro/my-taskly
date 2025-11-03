@@ -87,7 +87,7 @@
   </div>
 </template>
 <script>
-import api from "@/api";
+import api from '@/services/api';
 import BaseModal from "@/components/BaseModal.vue";
 import TaskCard from "@/components/TaskCard.vue";
 

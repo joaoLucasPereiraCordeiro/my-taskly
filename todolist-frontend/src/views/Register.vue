@@ -66,8 +66,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/services/api'
-import store from '@/store'
+import api from '@/services/api';
 
 const router = useRouter()
 const name = ref('')
