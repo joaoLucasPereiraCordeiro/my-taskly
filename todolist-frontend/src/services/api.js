@@ -1,9 +1,15 @@
-// api.js
 import axios from "axios";
 import secureStorage from "@/utils/secureStorage";
 
+// Para Vue CLI, usar process.env.VUE_APP_API_URL
+const baseURL = process.env.VUE_APP_API_URL;
+
+if (!baseURL) {
+  console.error("VUE_APP_API_URL não está definida!");
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: baseURL,
 });
 
 api.interceptors.request.use((config) => {

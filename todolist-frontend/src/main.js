@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-import api from "@/services/api";
+import api from "@/api.js";
 import axios from "axios";
 import secureStorage from "@/utils/secureStorage"; // 🔐 importa o armazenamento seguro
 
