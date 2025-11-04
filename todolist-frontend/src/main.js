@@ -12,8 +12,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 // Configuração da URL base da API
-axios.defaults.baseURL =
-  process.env.VUE_APP_API_URL || "http://localhost:8000/api";
+axios.defaults.baseURL = process.env.VUE_APP_API_URL || "http://localhost:8000/api";
 
 // Se houver token salvo, adiciona Authorization automaticamente
 const token = secureStorage.getItem("token");
