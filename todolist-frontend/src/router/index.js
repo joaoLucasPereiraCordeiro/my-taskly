@@ -5,6 +5,7 @@ import Dashboard from "@/views/Dashboard.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
 import Admin from "@/views/Admin.vue"; // Nova view para admin
+import store from "@/services/store"; 
 
 const routes = [
   { path: "/", redirect: "/login" },
