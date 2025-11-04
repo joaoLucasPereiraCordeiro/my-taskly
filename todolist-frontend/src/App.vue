@@ -147,6 +147,8 @@ export default {
     }, 60000);
   }
 };
+
+
 </script>
 
 <style scoped>
