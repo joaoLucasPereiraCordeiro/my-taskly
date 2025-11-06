@@ -2,13 +2,21 @@
 
 return [
 
-    'paths' => ['api/*', 'login', 'register', 'sanctum/csrf-cookie'],
+    /*
+    |--------------------------------------------------------------------------
+    | CORS Configuration
+    |--------------------------------------------------------------------------
+    */
+
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'http://localhost:8080', // para desenvolvimento local
-        'https://my-taskly-j0pehcjg5-joao-lucas-projects-1bb67238.vercel.app', // URL Vercel
+        'https://my-taskly-frontend-avubnc9gb-joao-lucas-projects-1bb67238.vercel.app',
+        'https://my-taskly-teal.vercel.app',
+        'http://localhost:5173',
+        'http://localhost:8080',
     ],
 
     'allowed_origins_patterns' => [],
@@ -19,6 +27,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];
