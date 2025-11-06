@@ -2,30 +2,17 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Laravel CORS Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Esse arquivo controla quais origens podem acessar sua API.
-    | Aqui permitimos o localhost para desenvolvimento e
-    | qualquer subdomínio do seu app hospedado na Vercel.
-    |
-    */
-
     'paths' => ['api/*', 'login', 'register', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
-    // 🔥 Permite o localhost e QUALQUER subdomínio da Vercel
     'allowed_origins' => [
-        'http://localhost:8080',
+        'http://localhost:8080', // desenvolvimento local
+        'https://my-taskly-teal.vercel.app', // seu novo domínio no Vercel
+        'https://my-taskly-frontend-lk64pdsxp-joao-lucas-projects-1bb67238.vercel.app', // antigo (opcional)
     ],
 
-    // 🔥 Padrão para aceitar qualquer domínio *.vercel.app
-    'allowed_origins_patterns' => [
-        '/^https:\/\/my-taskly-frontend.*\.vercel\.app$/',
-    ],
+    'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
@@ -33,7 +20,6 @@ return [
 
     'max_age' => 0,
 
-    // Deixe false se não usa cookies / sessões
     'supports_credentials' => false,
 
 ];
