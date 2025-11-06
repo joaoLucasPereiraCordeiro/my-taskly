@@ -7,9 +7,8 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'http://localhost:8080', // desenvolvimento local
-        'https://my-taskly-teal.vercel.app', // seu novo domínio no Vercel
-        'https://my-taskly-frontend-lk64pdsxp-joao-lucas-projects-1bb67238.vercel.app', // antigo (opcional)
+        'http://localhost:8080', // para desenvolvimento local
+        'https://my-taskly-j0pehcjg5-joao-lucas-projects-1bb67238.vercel.app', // URL Vercel
     ],
 
     'allowed_origins_patterns' => [],
