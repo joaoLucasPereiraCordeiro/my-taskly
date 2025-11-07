@@ -2,7 +2,7 @@ import axios from "axios";
 import secureStorage from "@/utils/secureStorage";
 
 // Define a URL base corretamente
-const baseURL = `${process.env.VUE_APP_API_URL || "http://localhost:8000"}/api`;
+const baseURL = `${process.env.VUE_APP_API_URL || "http://localhost:8000"}`;
 
 // Log de depuração opcional (remove depois de testar)
 console.log("🔗 API Base URL:", baseURL);
