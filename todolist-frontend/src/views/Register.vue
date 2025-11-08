@@ -47,7 +47,8 @@
           <!-- Botão Cadastrar -->
           <div class="d-grid">
             <button type="submit" class="btn-register" :disabled="loading">
-              <span>Cadastrar</span>
+              <span v-if="!loading">Cadastrar</span>
+              <span v-else>⏳ Cadastrando...</span>
             </button>
           </div>
         </form>
@@ -64,54 +65,51 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import api from '@/services/api';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+import api from "@/services/api";
 
-const router = useRouter()
-const name = ref('')
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
+const router = useRouter();
+const store = useStore();
+
+const name = ref("");
+const email = ref("");
+const password = ref("");
+const loading = ref(false);
 
 const handleRegister = async () => {
-  loading.value = true
+  loading.value = true;
 
   try {
     const response = await api.post('/register', {
       name: name.value,
       email: email.value,
       password: password.value
-    })
+    });
 
-    const token = response.data.token
-    const user = response.data.user
-
-    if (token && user) {
-      // Salva no store
-      store.commit('setToken', token)
-      store.commit('setUser', user)
-
-      // Aguarda o fetchUser para garantir que os dados estejam prontos
-      await store.dispatch('fetchUser')
-
-      // Redireciona com replace para evitar voltar pro /register
-      await router.replace('/home')
+    if (response.data?.token) {
+      alert('✅ Cadastro realizado com sucesso! Faça login para continuar.');
+      router.replace('/login');
     } else {
-      alert('Cadastro realizado, mas sem token. Faça login manualmente.')
-      router.replace('/login')
+      alert('Cadastro concluído, mas sem token. Faça login manualmente.');
+      router.replace('/login');
     }
+
   } catch (e) {
-    if (e.response?.data?.message) {
-      alert(`Erro: ${e.response.data.message}`)
+    if (e.response?.data?.errors) {
+      // mostra erro de validação bonito
+      const messages = Object.values(e.response.data.errors)
+        .flat()
+        .join('\n');
+      alert(`⚠️ Erro de validação:\n${messages}`);
     } else {
-      alert('Erro ao cadastrar')
+      alert('Erro ao cadastrar usuário.');
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
-
+};
 </script>
 
 <style scoped>
@@ -119,22 +117,22 @@ const handleRegister = async () => {
   background-color: #ff0084;
   color: white;
   border: none;
-  padding: 6px 16px;
+  padding: 10px 18px;
   border-radius: 6px;
-  font-weight: 500;
+  font-weight: 600;
+  transition: 0.2s ease;
 }
 
+.btn-register:hover {
+  background-color: #e60074;
+}
 
 input,
-input:focus,
 textarea,
-textarea:focus,
-select,
-select:focus {
+select {
   outline: none !important;
   box-shadow: none !important;
   border-color: #ced4da !important;
   resize: none !important;
-} 
-
+}
 </style>
