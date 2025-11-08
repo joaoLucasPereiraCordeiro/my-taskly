@@ -47,7 +47,8 @@
           <!-- Botão Cadastrar -->
           <div class="d-grid">
             <button type="submit" class="btn-register" :disabled="loading">
-              <span>Cadastrar</span>
+              <span v-if="!loading">Cadastrar</span>
+              <span v-else>⏳ Cadastrando...</span>
             </button>
           </div>
         </form>
@@ -64,54 +65,66 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import api from '@/services/api';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+import api from "@/services/api";
 
-const router = useRouter()
-const name = ref('')
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
+const router = useRouter();
+const store = useStore();
+
+const name = ref("");
+const email = ref("");
+const password = ref("");
+const loading = ref(false);
 
 const handleRegister = async () => {
-  loading.value = true
+  loading.value = true;
 
   try {
-    const response = await api.post('/register', {
+    const response = await api.post("/register", {
       name: name.value,
       email: email.value,
-      password: password.value
-    })
+      password: password.value,
+    });
 
-    const token = response.data.token
-    const user = response.data.user
+    // Verifica se o retorno contém token e user
+    const { token, user, message } = response.data;
 
     if (token && user) {
-      // Salva no store
-      store.commit('setToken', token)
-      store.commit('setUser', user)
+      // Salva dados no store (se existir)
+      if (store) {
+        store.commit("setToken", token);
+        store.commit("setUser", user);
+      }
 
-      // Aguarda o fetchUser para garantir que os dados estejam prontos
-      await store.dispatch('fetchUser')
+      alert(message || "Cadastro realizado com sucesso! 🎉");
 
-      // Redireciona com replace para evitar voltar pro /register
-      await router.replace('/home')
+      // Redireciona para o login após sucesso
+      await router.replace("/login");
     } else {
-      alert('Cadastro realizado, mas sem token. Faça login manualmente.')
-      router.replace('/login')
+      alert("Cadastro concluído! Faça login para continuar.");
+      await router.replace("/login");
     }
   } catch (e) {
-    if (e.response?.data?.message) {
-      alert(`Erro: ${e.response.data.message}`)
+    if (e.response?.status === 422) {
+      const errors = e.response.data.errors;
+      if (errors?.email) {
+        alert("❌ Esse e-mail já está cadastrado!");
+      } else if (errors?.password) {
+        alert("❌ Senha inválida (mínimo de 6 caracteres).");
+      } else {
+        alert(e.response.data.message || "Erro de validação ao cadastrar.");
+      }
+    } else if (e.response?.data?.message) {
+      alert(`❌ Erro: ${e.response.data.message}`);
     } else {
-      alert('Erro ao cadastrar')
+      alert("❌ Erro inesperado ao cadastrar. Tente novamente.");
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
-
+};
 </script>
 
 <style scoped>
@@ -119,22 +132,22 @@ const handleRegister = async () => {
   background-color: #ff0084;
   color: white;
   border: none;
-  padding: 6px 16px;
+  padding: 10px 18px;
   border-radius: 6px;
-  font-weight: 500;
+  font-weight: 600;
+  transition: 0.2s ease;
 }
 
+.btn-register:hover {
+  background-color: #e60074;
+}
 
 input,
-input:focus,
 textarea,
-textarea:focus,
-select,
-select:focus {
+select {
   outline: none !important;
   box-shadow: none !important;
   border-color: #ced4da !important;
   resize: none !important;
-} 
-
+}
 </style>
