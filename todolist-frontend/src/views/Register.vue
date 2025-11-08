@@ -67,11 +67,9 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { useStore } from "vuex";
 import api from "@/services/api";
 
 const router = useRouter();
-const store = useStore();
 
 const name = ref("");
 const email = ref("");
@@ -82,29 +80,32 @@ const handleRegister = async () => {
   loading.value = true;
 
   try {
-    const response = await api.post('/register', {
+    const response = await api.post("/register", {
       name: name.value,
       email: email.value,
-      password: password.value
+      password: password.value,
     });
 
-    if (response.data?.token) {
-      alert('✅ Cadastro realizado com sucesso! Faça login para continuar.');
-      router.replace('/login');
+    // Se a API retornar token ou user, mostra mensagem de sucesso
+    if (response.data?.token || response.data?.user) {
+      alert("✅ Cadastro realizado com sucesso! Faça login para continuar.");
+      router.replace("/login");
     } else {
-      alert('Cadastro concluído, mas sem token. Faça login manualmente.');
-      router.replace('/login');
+      alert("Cadastro concluído, mas sem token. Faça login manualmente.");
+      router.replace("/login");
     }
 
   } catch (e) {
-    if (e.response?.data?.errors) {
-      // mostra erro de validação bonito
+    if (e.response?.status === 422 && e.response.data.errors) {
+      // Formata os erros de validação para mostrar de forma clara
       const messages = Object.values(e.response.data.errors)
         .flat()
-        .join('\n');
+        .join("\n");
       alert(`⚠️ Erro de validação:\n${messages}`);
+    } else if (e.response?.data?.message) {
+      alert(`❌ Erro: ${e.response.data.message}`);
     } else {
-      alert('Erro ao cadastrar usuário.');
+      alert("❌ Erro inesperado ao cadastrar. Tente novamente.");
     }
   } finally {
     loading.value = false;
@@ -122,7 +123,6 @@ const handleRegister = async () => {
   font-weight: 600;
   transition: 0.2s ease;
 }
-
 .btn-register:hover {
   background-color: #e60074;
 }

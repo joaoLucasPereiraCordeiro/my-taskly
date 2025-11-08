@@ -4,11 +4,12 @@ import secureStorage from "@/utils/secureStorage";
 // Define a URL base corretamente
 const baseURL = `${process.env.VUE_APP_API_URL || "http://localhost:8000"}/api`;
 
-// Log de depuração opcional (remove depois de testar)
+// Log de depuração opcional
 console.log("🔗 API Base URL:", baseURL);
 
 const api = axios.create({
   baseURL,
+  withCredentials: true, // <--- ESSENCIAL para Laravel Sanctum
 });
 
 // Interceptor para adicionar o token automaticamente
