@@ -9,7 +9,7 @@ console.log("🔗 API Base URL:", baseURL);
 
 const api = axios.create({
   baseURL,
-  withCredentials: true, // <--- ESSENCIAL para Laravel Sanctum
+  withCredentials: true, 
 });
 
 // Interceptor para adicionar o token automaticamente
@@ -21,7 +21,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor opcional para tratar erros de rede
+// Interceptor 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
