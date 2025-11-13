@@ -2,12 +2,9 @@ const { defineConfig } = require("@vue/cli-service");
 
 module.exports = defineConfig({
   transpileDependencies: true,
-
-  // Corrige rotas e carregamento no Vercel
-  publicPath: "./",
-
-  // Garante compatibilidade de CORS e cookies se necessário
+  publicPath: process.env.NODE_ENV === "production" ? "/" : "/",
   devServer: {
     allowedHosts: "all",
+    historyApiFallback: true, // garante que o Vue Router funcione nas rotas internas
   },
 });

@@ -6,14 +6,16 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'https://my-taskly-teal.vercel.app',
+        env('https://my-taskly-teal.vercel.app', 'http://localhost:8080'),
+        'http://localhost:8080',
+        'http://127.0.0.1:8080',
     ],
 
     'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
-    'exposed_headers' => false,
+    'exposed_headers' => [],
 
     'max_age' => 0,
 
