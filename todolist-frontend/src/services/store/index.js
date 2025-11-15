@@ -93,26 +93,27 @@ export default createStore({
         throw error;
       }
     },
+async checkAuth({ commit, dispatch, state }) {
+  commit("setLoadingTrue"); // garante loading antes
 
-    async checkAuth({ commit, dispatch, state }) {
-      try {
-        if (state.token) {
-          axios.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${state.token}`;
-          await dispatch("fetchUser");
-          if (state.user.role === "user") {
-            await dispatch("fetchTasks");
-          }
-        } else {
-          commit("logout");
-        }
-      } catch (error) {
-        commit("logout");
-      } finally {
-        commit("setLoading", false);
+  try {
+    if (state.token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${state.token}`;
+      await dispatch("fetchUser");
+
+      // Carrega as tarefas apenas uma vez após validar o usuário
+      if (state.user.role === "user" && state.tasks.length === 0) {
+        await dispatch("fetchTasks");
       }
-    },
+    } else {
+      commit("logout");
+    }
+  } catch (error) {
+    commit("logout");
+  } finally {
+    commit("setLoadingFalse");
+  }
+},
 
     logout({ commit }) {
       commit("logout");
