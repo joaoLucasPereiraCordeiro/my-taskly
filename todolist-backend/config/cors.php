@@ -6,10 +6,11 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        env('https://my-taskly-teal.vercel.app', 'http://localhost:8080'),
-        'http://localhost:8080',
-        'http://127.0.0.1:8080',
-    ],
+    'https://my-taskly-teal.vercel.app',
+    'https://my-taskly-auhmqo64n-joao-lucas-projects-1bb67238.vercel.app', // se necessário
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+],
 
     'allowed_origins_patterns' => [],
 

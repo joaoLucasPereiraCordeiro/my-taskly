@@ -1,0 +1,10 @@
+{
+  "builds": [
+    {
+      "src": "todolist-frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "todolist-frontend/dist" }
+    }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "todolist-frontend/dist/index.html" }]
+}
