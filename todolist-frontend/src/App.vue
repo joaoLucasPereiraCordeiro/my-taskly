@@ -140,12 +140,12 @@ export default {
       this.mobileMenuOpen = false;
     }
   },
-  async created() {
-    await this.checkAuth();
-    setInterval(() => {
-      if (this.isAuthenticated) this.fetchTasks();
-    }, 10000);
+async created() {
+  await this.checkAuth();
+  if (this.isAuthenticated) {
+    this.fetchTasks(); // apenas uma vez
   }
+}
 };
 
 
