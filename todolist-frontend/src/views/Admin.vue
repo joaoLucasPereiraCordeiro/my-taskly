@@ -127,7 +127,6 @@ async function fetchAdminData() {
     stats.value = statsResponse.data
   } catch (error) {
     alert("Erro ao carregar dados do admin")
-    console.error(error)
   }
 }
 
@@ -138,7 +137,6 @@ async function deleteUser(id) {
     users.value = users.value.filter((user) => user.id !== id)
   } catch (error) {
     alert("Erro ao excluir usuário")
-    console.error(error)
   }
 }
 

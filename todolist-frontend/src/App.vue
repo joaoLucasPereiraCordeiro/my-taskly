@@ -139,7 +139,7 @@ export default {
   async created() {
     await this.checkAuth();
     if (this.isAuthenticated) {
-      await this.fetchTasks(); // chamado APENAS uma vez
+      await this.fetchTasks();
     }
   }
 };

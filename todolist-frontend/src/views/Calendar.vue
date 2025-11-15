@@ -122,7 +122,7 @@ export default {
         const res = await api.get("/tasks");
         this.tasks = res.data;
       } catch (err) {
-        console.error("Erro ao buscar tarefas:", err);
+        console.error("Erro ao buscar tarefas:");
       }
     },
     monthName(monthIndex) {

@@ -68,7 +68,7 @@ export default createStore({
           await dispatch("fetchTasks");
         }
       } catch (error) {
-        console.error("Erro no login:", error);
+        console.error("Erro no login:");
         throw error;
       }
     },
@@ -78,7 +78,7 @@ export default createStore({
         const response = await axios.get("/api/tasks");
         commit("setTasks", response.data);
       } catch (error) {
-        console.error("Erro ao buscar tarefas:", error);
+        console.error("Erro ao buscar tarefas");
         commit("setTasks", []);
       }
     },
@@ -89,7 +89,7 @@ export default createStore({
         const response = await axios.get("/api/user");
         commit("setUser", response.data);
       } catch (error) {
-        console.error("Erro ao buscar usuário:", error);
+        console.error("Erro ao buscar usuário");
         throw error;
       }
     },

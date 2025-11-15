@@ -29,5 +29,3 @@ app.use(router);
 
 // Monta a aplicação
 app.mount("#app");
-
-console.log("Aplicação Vue inicializada com sucesso!");

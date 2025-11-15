@@ -142,8 +142,20 @@ import { formatDateToISO } from '../utils/formatDate';
 import api from '../services/api';
 
 export default {
-  components: { BaseModal, TaskDetails, NotesPad, TaskCreate, TaskEdit, Message, TaskFilterButtons, TaskCard, NoTasksMessage },
-  props: { tasks: Array }, // tarefas agora vêm do App.vue
+  components: { 
+    BaseModal, 
+    TaskDetails, 
+    NotesPad, 
+    TaskCreate, 
+    TaskEdit, 
+    Message, 
+    TaskFilterButtons, 
+    TaskCard, 
+    NoTasksMessage 
+  },
+
+  props: { tasks: Array },
+
   data() {
     return {
       newTask: this.emptyTask(),
@@ -157,11 +169,14 @@ export default {
       isSubmitting: false,
     };
   },
+
   computed: {
     ...mapState(['tasks']),
+
     filteredTasks() {
       return filterTasks(this.tasks, this.activeFilter);
     },
+
     searchedTasks() {
       if (!this.searchTerm.trim()) return this.filteredTasks;
       const term = this.searchTerm.toLowerCase();
@@ -169,6 +184,7 @@ export default {
         task.title.toLowerCase().includes(term)
       );
     },
+
     filterTitle() {
       switch (this.activeFilter) {
         case 'all': return 'Todas as Tarefas';
@@ -181,24 +197,47 @@ export default {
       }
     },
   },
+
   methods: {
-     emptyTask() { return { title: "", description: "", due_date: "", subtasks: [] }; },
-    openCreateModal() { this.newTask = this.emptyTask(); this.showCreateModal = true; },
-    closeCreateModal() { this.newTask = this.emptyTask(); this.showCreateModal = false; },
-    setFilter(filter) { this.activeFilter = filter; },
-    showTaskDetails(task) { this.selectedTask = task; },
+    emptyTask() {
+      return { title: "", description: "", due_date: "", subtasks: [] };
+    },
+
+    openCreateModal() {
+      this.newTask = this.emptyTask();
+      this.showCreateModal = true;
+    },
+
+    closeCreateModal() {
+      this.newTask = this.emptyTask();
+      this.showCreateModal = false;
+    },
+
+    setFilter(filter) {
+      this.activeFilter = filter;
+    },
+
+    showTaskDetails(task) {
+      this.selectedTask = task;
+    },
 
     async createTask(newTask) {
-      if (!newTask.title) { this.message = "O título da tarefa é obrigatório."; return; }
+      if (!newTask.title) {
+        this.message = "O título da tarefa é obrigatório.";
+        return;
+      }
+
       this.isSubmitting = true;
+
       try {
         const response = await api.post("/tasks", newTask);
         this.tasks.push(response.data);
+
         this.closeCreateModal();
         this.message = "Tarefa criada com sucesso!";
         setTimeout(() => this.message = "", 2000);
+
       } catch (error) {
-        console.error(error);
         this.message = "Erro ao criar tarefa.";
       } finally {
         this.isSubmitting = false;
@@ -206,18 +245,25 @@ export default {
     },
 
     async updateTask(updatedTask) {
-      if (!updatedTask.title) { this.message = "O título é obrigatório."; return; }
+      if (!updatedTask.title) {
+        this.message = "O título é obrigatório.";
+        return;
+      }
+
       if (updatedTask.subtasks && Array.isArray(updatedTask.subtasks)) {
         updatedTask.subtasks = updatedTask.subtasks.filter(sub => sub.title && sub.title.trim() !== '');
       }
+
       try {
         const response = await api.put(`/tasks/${updatedTask.id}`, updatedTask);
+
         const index = this.tasks.findIndex(t => t.id === updatedTask.id);
         if (index !== -1) this.tasks.splice(index, 1, response.data);
+
         this.showEditModal = false;
         this.message = "Tarefa atualizada com sucesso!";
+
       } catch (error) {
-        console.error(error);
         this.message = "Erro ao atualizar tarefa.";
       } finally {
         setTimeout(() => this.message = "", 2000);
@@ -226,20 +272,28 @@ export default {
 
     async toggleSubtask(subtask) {
       subtask.completed = !subtask.completed;
+
       try {
-        const response = await api.put(`/subtasks/${subtask.id}`, { title: subtask.title, completed: subtask.completed });
+        const response = await api.put(`/subtasks/${subtask.id}`, {
+          title: subtask.title,
+          completed: subtask.completed
+        });
+
         const updatedSubtask = response.data.subtask;
         const updatedTask = response.data.task;
 
         const taskIndex = this.tasks.findIndex(t => t.id === updatedTask.id);
+
         if (taskIndex !== -1) {
           const task = this.tasks[taskIndex];
           const subtaskIndex = task.subtasks.findIndex(s => s.id === updatedSubtask.id);
+
           if (subtaskIndex !== -1) task.subtasks[subtaskIndex] = updatedSubtask;
+
           task.completed = updatedTask.completed;
         }
+
       } catch (error) {
-        console.error(error);
         subtask.completed = !subtask.completed;
         this.message = 'Erro ao atualizar subtarefa.';
       }
@@ -247,6 +301,7 @@ export default {
 
     async toggleComplete(task) {
       task.completed = !task.completed;
+
       const formatDateYMD = (date) => {
         if (!date) return null;
         if (typeof date === "string" && date.includes("/")) {
@@ -264,11 +319,13 @@ export default {
           due_date: formatDateYMD(task.due_date),
           completed: task.completed,
         });
+
         const updatedTask = response.data;
         const index = this.tasks.findIndex(t => t.id === task.id);
+
         if (index !== -1) this.tasks.splice(index, 1, updatedTask);
+
       } catch (error) {
-        console.error(error);
         task.completed = !task.completed;
         this.message = "Erro ao atualizar tarefa.";
       }
@@ -280,19 +337,20 @@ export default {
     },
 
     async onDeleteTask(task) {
-      
-        try {
-          await api.delete(`/tasks/${task.id}`);
-          const index = this.tasks.findIndex(t => t.id === task.id);
-          if (index !== -1) this.tasks.splice(index, 1);
-          this.selectedTask = null;
-          this.message = "Tarefa excluída com sucesso!";
-        } catch (error) {
-          console.error(error);
-          this.message = "Erro ao excluir tarefa.";
-        }
-        setTimeout(() => (this.message = ""), 2000);
-      
+      try {
+        await api.delete(`/tasks/${task.id}`);
+
+        const index = this.tasks.findIndex(t => t.id === task.id);
+        if (index !== -1) this.tasks.splice(index, 1);
+
+        this.selectedTask = null;
+        this.message = "Tarefa excluída com sucesso!";
+
+      } catch (error) {
+        this.message = "Erro ao excluir tarefa.";
+      }
+
+      setTimeout(() => (this.message = ""), 2000);
     },
 
     handleVoiceInput({ title, due_date }) {
@@ -300,17 +358,22 @@ export default {
         const delimitadores = [' no ', ' em ', ' dia ', ' de '];
         let tituloLower = title.toLowerCase();
         let ultimoIndex = -1;
+
         delimitadores.forEach(delim => {
           const idx = tituloLower.lastIndexOf(delim);
           if (idx > ultimoIndex) ultimoIndex = idx;
         });
+
         let tituloLimpo = ultimoIndex > -1 ? title.substring(0, ultimoIndex) : title;
         tituloLimpo = tituloLimpo.trim();
         tituloLimpo = tituloLimpo.charAt(0).toUpperCase() + tituloLimpo.slice(1);
+
         this.newTask.title = tituloLimpo;
       }
+
       if (due_date) this.newTask.due_date = due_date;
     },
+
   },
 };
 </script>

@@ -147,7 +147,7 @@ export default {
       this.form.subtasks = data.subtasks || []
       this.emptySubtaskTitle = ''
       this.loadingVoice = false
-      this.mode = 'form' // volta para o formulário automaticamente
+      this.mode = 'form'
     },
     handleListening(status) {
       this.$emit('listening-status', status)

@@ -92,8 +92,8 @@ const handleRegister = async () => {
     }
 
   } catch (e) {
-    console.error("Erro ao cadastrar:", e?.response?.data || e);
-    // não redireciona — usuário permanece na página
+    console.error("Erro ao cadastrar:");
+   
   } finally {
     loading.value = false;
   }

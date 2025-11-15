@@ -58,7 +58,7 @@ export default {
       const res = await api.get("/admin/users"); // chama a rota da API
       this.users = res.data.users;
     } catch (err) {
-      console.error("Erro ao buscar usuários:", err);
+      console.error("Erro ao buscar usuários");
     } finally {
       this.loading = false;
     }

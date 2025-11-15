@@ -83,8 +83,8 @@ router.push('/home');
 
 
   } catch (e) {
-    console.error("Erro ao fazer login:", e?.response?.data || e);
-    // não mostra alert, não redireciona
+    console.error("Erro ao fazer login:");
+  
     store.commit('setLoadingFalse');
   }
 };
