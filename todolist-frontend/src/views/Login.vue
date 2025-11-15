@@ -66,35 +66,29 @@ const router = useRouter()
 const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
-
 const handleLogin = async () => {
-  // ativa o spider imediatamente
-  store.commit('setLoadingTrue')
+  store.commit('setLoadingTrue');
 
   try {
     await store.dispatch('login', {
       email: email.value,
       password: password.value,
-    })
+    });
 
-    await store.dispatch('fetchUser')
+    await store.dispatch('fetchUser');
 
-    // mantém o spider visível enquanto a conta é montada
-    setTimeout(async () => {
-      if (store.getters.user?.role === 'user') {
-        await store.dispatch('fetchTasks')
-      }
+    await store.dispatch('fetchTasks');
+store.commit('setLoadingFalse');
+router.push('/home');
 
-      // desativa o spider só quando tudo carregou
-      store.commit('setLoadingFalse')
 
-      router.push('/home')
-    }, 1000) // pode ajustar o tempo (ms)
   } catch (e) {
-    alert('⚠️ Falha ao fazer login: Verifique suas credenciais.')
-    store.commit('setLoadingFalse')
+    console.error("Erro ao fazer login:", e?.response?.data || e);
+    // não mostra alert, não redireciona
+    store.commit('setLoadingFalse');
   }
-}
+};
+
 
 </script>
 

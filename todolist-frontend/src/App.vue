@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- Loading spinner -->
+    <!-- Loading spinner global -->
     <div v-if="isLoading" class="d-flex justify-content-center align-items-center min-vh-100">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Carregando...</span>
@@ -19,28 +19,24 @@
           <h2 class="h5 fw-bold mb-5 text-black">
             My Task<span class="highlight-cut">ly</span>
           </h2>
-
           <ul class="list-unstyled">
             <router-link to="/home" class="text-decoration-none fw-medium">
-            <li class="custom-btn mb-3">
+              <li class="custom-btn mb-3">
                 <i class="fa-solid fa-calendar me-2"></i>Entrada
-            </li>
+              </li>
             </router-link>
-
             <router-link to="/calendario" class="text-decoration-none fw-medium">
-            <li class="custom-btn mb-3">
+              <li class="custom-btn mb-3">
                 <i class="fa-solid fa-calendar me-2"></i>Calendário
-            </li>
+              </li>
             </router-link>
-
             <router-link to="/dashboard" class="text-decoration-none fw-medium">
-            <li class="custom-btn mb-3">
+              <li class="custom-btn mb-3">
                 <i class="fas fa-chart-line me-2"></i>Dashboard
-            </li>
+              </li>
             </router-link>
           </ul>
         </div>
-
         <div class="pt-5 d-flex flex-column">
           <li class="custom-btn mb-3">
             <a href="#" @click.prevent="handleLogout" class="text-decoration-none fw-bold">
@@ -60,37 +56,33 @@
         <i class="fa-solid fa-bars"></i>
       </button>
 
-      <!-- MENU MOBILE COM TRANSIÇÃO -->
+      <!-- MENU MOBILE -->
       <transition name="slide">
         <div v-if="mobileMenuOpen" class="mobile-menu d-flex flex-column">
           <h5 class="fw-bold mb-4">My Task<span class="highlight-cut">ly</span></h5>
-
           <ul class="list-unstyled flex-grow-1">
             <router-link to="/home" class="text-decoration-none fw-medium" @click="closeMobileMenu">
-            <li class="custom-btn mb-3">
+              <li class="custom-btn mb-3">
                 <i class="fa-solid fa-calendar me-2"></i>Entrada
-            </li>
-          </router-link>
-
-          <router-link to="/calendario" class="text-decoration-none fw-medium" @click="closeMobileMenu">
-            <li class="custom-btn mb-3">
+              </li>
+            </router-link>
+            <router-link to="/calendario" class="text-decoration-none fw-medium" @click="closeMobileMenu">
+              <li class="custom-btn mb-3">
                 <i class="fa-solid fa-calendar me-2"></i>Calendário
-            </li>
-          </router-link>
-
-          <router-link to="/dashboard" class="text-decoration-none fw-medium" @click="closeMobileMenu">
-            <li class="custom-btn mb-3">
+              </li>
+            </router-link>
+            <router-link to="/dashboard" class="text-decoration-none fw-medium" @click="closeMobileMenu">
+              <li class="custom-btn mb-3">
                 <i class="fas fa-chart-line me-2"></i>Dashboard
-            </li>
-          </router-link>
+              </li>
+            </router-link>
           </ul>
-
           <div>
             <a href="#" @click.prevent="handleLogout" class="text-decoration-none fw-bold">
-            <li class="custom-btn mb-3">
+              <li class="custom-btn mb-3">
                 <i class="fas fa-right-from-bracket"></i> Sair
-            </li>
-          </a>
+              </li>
+            </a>
           </div>
         </div>
       </transition>
@@ -101,7 +93,7 @@
         :style="{ marginLeft: isAuthenticated && !isAdmin ? '16rem' : '0' }"
         @click="closeMobileMenu"
       >
-        <router-view />
+        <router-view :tasks="tasksFromStore" />
       </main>
     </div>
 
@@ -111,7 +103,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapState } from "vuex";
 import RoboAssistant from "@/components/RoboAssistant.vue";
 
 export default {
@@ -122,9 +114,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["isAuthenticated", "isLoading", "user", "tasks"]),
+    ...mapState(['tasks']),
+    ...mapGetters(["isAuthenticated", "isLoading", "user"]),
     isAdmin() {
       return this.user && this.user.role === "admin";
+    },
+    tasksFromStore() {
+      return this.tasks;
     }
   },
   methods: {
@@ -140,15 +136,13 @@ export default {
       this.mobileMenuOpen = false;
     }
   },
-async created() {
-  await this.checkAuth();
-  if (this.isAuthenticated) {
-    this.fetchTasks(); // apenas uma vez
+  async created() {
+    await this.checkAuth();
+    if (this.isAuthenticated) {
+      await this.fetchTasks(); // chamado APENAS uma vez
+    }
   }
-}
 };
-
-
 </script>
 
 <style scoped>

@@ -1,14 +1,18 @@
 <template>
   <div>
-      <TaskList />
+    <TaskList :tasks="tasks" />
   </div>
 </template>
 
 <script>
 import TaskList from '../components/TaskList.vue';
+import { mapState } from 'vuex';
 
 export default {
-  name: 'Home',
+  name: 'HomeView',
   components: { TaskList },
+  computed: {
+    ...mapState(['tasks']),
+  }
 }
 </script>

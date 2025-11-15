@@ -142,17 +142,8 @@ import { formatDateToISO } from '../utils/formatDate';
 import api from '../services/api';
 
 export default {
-  components: {
-    BaseModal,
-    TaskDetails,
-    NotesPad,
-    TaskCreate,
-    TaskEdit,
-    Message,
-    TaskFilterButtons,
-    TaskCard,
-    NoTasksMessage,
-  },
+  components: { BaseModal, TaskDetails, NotesPad, TaskCreate, TaskEdit, Message, TaskFilterButtons, TaskCard, NoTasksMessage },
+  props: { tasks: Array }, // tarefas agora vêm do App.vue
   data() {
     return {
       newTask: this.emptyTask(),
@@ -161,13 +152,10 @@ export default {
       showCreateModal: false,
       showEditModal: false,
       message: "",
-      activeFilter: 'all', // exibe todas as tarefas ao iniciar
+      activeFilter: 'all',
       searchTerm: "",
       isSubmitting: false,
     };
-  },
-  async created() {
-    await this.$store.dispatch('fetchTasks');
   },
   computed: {
     ...mapState(['tasks']),
@@ -194,7 +182,7 @@ export default {
     },
   },
   methods: {
-    emptyTask() { return { title: "", description: "", due_date: "", subtasks: [] }; },
+     emptyTask() { return { title: "", description: "", due_date: "", subtasks: [] }; },
     openCreateModal() { this.newTask = this.emptyTask(); this.showCreateModal = true; },
     closeCreateModal() { this.newTask = this.emptyTask(); this.showCreateModal = false; },
     setFilter(filter) { this.activeFilter = filter; },

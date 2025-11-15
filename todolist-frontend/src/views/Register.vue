@@ -86,32 +86,20 @@ const handleRegister = async () => {
       password: password.value,
     });
 
-    // Se a API retornar token ou user, mostra mensagem de sucesso
-    if (response.data?.token || response.data?.user) {
-      alert("✅ Cadastro realizado com sucesso! Faça login para continuar.");
-      router.replace("/login");
-    } else {
-      alert("Cadastro concluído, mas sem token. Faça login manualmente.");
+    // Cadastro deu certo → redireciona para login
+    if (response.data?.user || response.data?.token) {
       router.replace("/login");
     }
 
   } catch (e) {
-    if (e.response?.status === 422 && e.response.data.errors) {
-      // Formata os erros de validação para mostrar de forma clara
-      const messages = Object.values(e.response.data.errors)
-        .flat()
-        .join("\n");
-      alert(`⚠️ Erro de validação:\n${messages}`);
-    } else if (e.response?.data?.message) {
-      alert(`❌ Erro: ${e.response.data.message}`);
-    } else {
-      alert("❌ Erro inesperado ao cadastrar. Tente novamente.");
-    }
+    console.error("Erro ao cadastrar:", e?.response?.data || e);
+    // não redireciona — usuário permanece na página
   } finally {
     loading.value = false;
   }
 };
 </script>
+
 
 <style scoped>
 .btn-register {
