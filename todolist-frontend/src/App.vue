@@ -144,7 +144,7 @@ export default {
     await this.checkAuth();
     setInterval(() => {
       if (this.isAuthenticated) this.fetchTasks();
-    }, 60000);
+    }, 10000);
   }
 };
 
