@@ -23,7 +23,9 @@ class VoiceTaskController extends Controller
             ], 422);
         }
 
-        // 🧠 Prompt atualizado e mais restritivo
+        Log::info('Texto recebido do front', ['text' => $text]);
+
+        // Prompt restritivo para o GPT
         $prompt = "
 Você é um assistente que transforma comandos de voz em JSON.
 Extraia APENAS o que for claramente dito.  
@@ -39,13 +41,12 @@ Regras:
 - Nunca invente dados.
 - Sempre devolva os quatro campos, mesmo que vazios.
 - Se o usuário disser apenas o título e data, retorne description vazio.
-- Mantenha as palavras de data exatamente como ditas (ex: 'amanhã', 'sábado', 'dia 20').
+- Mantenha as palavras de data exatamente como ditas.
 
 Texto a processar: \"$text\"
 ";
 
         try {
-            // 🔹 Chamada ao modelo GPT
             $response = OpenAI::chat()->create([
                 'model' => 'gpt-4o-mini',
                 'messages' => [
@@ -55,13 +56,28 @@ Texto a processar: \"$text\"
             ]);
 
             $json = $response['choices'][0]['message']['content'] ?? '{}';
-            $data = json_decode($json, true) ?? [];
+            Log::info('Resposta bruta do OpenAI', ['response' => $json]);
 
-            // 🔹 Interpretação da data em português
+            $data = json_decode($json, true);
+
+            if (!is_array($data)) {
+                $data = [
+                    'title' => '',
+                    'description' => '',
+                    'subtasks' => [],
+                    'due_date' => ''
+                ];
+            }
+
+            if (!isset($data['subtasks']) || !is_array($data['subtasks'])) {
+                $data['subtasks'] = [];
+            }
+
             $today = Carbon::today();
             $dueDate = null;
             $textoParaBuscar = strtolower($data['due_date'] ?? $text);
 
+            // Datas relativas
             if (str_contains($textoParaBuscar, 'hoje')) {
                 $dueDate = $today;
             } elseif (str_contains($textoParaBuscar, 'amanhã') || str_contains($textoParaBuscar, 'amanha')) {
@@ -70,6 +86,7 @@ Texto a processar: \"$text\"
                 $dueDate = $today->copy()->addDays(2);
             }
 
+            // Dias da semana
             if (!$dueDate) {
                 $diasSemana = [
                     'domingo' => Carbon::SUNDAY,
@@ -99,13 +116,12 @@ Texto a processar: \"$text\"
                 }
             }
 
-            // 📅 Interpretação de "dia 20" com ajuste de mês se necessário
+            // "dia XX"
             if (!$dueDate && preg_match('/dia (\d{1,2})/', $textoParaBuscar, $m)) {
                 $dia = intval($m[1]);
                 $mes = $today->month;
                 $ano = $today->year;
 
-                // Se o dia já passou, joga para o próximo mês
                 $dataTentativa = Carbon::createFromDate($ano, $mes, $dia);
                 if ($dataTentativa->isPast()) {
                     $dataTentativa->addMonth();
@@ -114,33 +130,28 @@ Texto a processar: \"$text\"
                 $dueDate = $dataTentativa;
             }
 
-            // 📅 Interpretação de datas completas tipo "20/11/2025"
+            // Datas completas dd/mm/yyyy
             if (!$dueDate && preg_match('/(\d{1,2})\/(\d{1,2})\/(\d{4})/', $textoParaBuscar, $m)) {
                 $dueDate = Carbon::createFromDate($m[3], $m[2], $m[1]);
             }
 
-            // Garante que nunca crie tarefa para o passado
             if ($dueDate && $dueDate->isPast()) {
                 $dueDate = $today;
             }
 
-// 🔤 Função auxiliar para capitalizar a primeira letra
-$capitalize = function ($string) {
-    $string = trim($string);
-    return $string ? mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1) : '';
-};
+            $capitalize = function ($string) {
+                $string = trim($string);
+                return $string ? mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1) : '';
+            };
 
-// 🔹 Montagem final dos dados com capitalização
-$result = [
-    'title' => $capitalize($data['title'] ?? '(sem título)'),
-    'description' => $capitalize($data['description'] ?? ''),
-    'subtasks' => isset($data['subtasks']) && is_array($data['subtasks'])
-        ? array_map($capitalize, $data['subtasks'])
-        : [],
-    'due_date' => $dueDate ? $dueDate->format('Y-m-d') : ''
-];
+            $result = [
+                'title' => $capitalize($data['title'] ?? '(sem título)'),
+                'description' => $capitalize($data['description'] ?? ''),
+                'subtasks' => array_map($capitalize, $data['subtasks']),
+                'due_date' => $dueDate ? $dueDate->format('Y-m-d') : ''
+            ];
 
-return response()->json($result);
+            return response()->json($result);
 
         } catch (\Exception $e) {
             Log::error('Erro ao processar comando de voz: ' . $e->getMessage());
