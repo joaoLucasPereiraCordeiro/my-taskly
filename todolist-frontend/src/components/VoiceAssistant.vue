@@ -39,7 +39,7 @@ if (SpeechRecognition) {
     emit('creating-task', true)
 
     try {
-      const response = await axios.post('/api/voice-task', { text: transcript })
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/voice-task`, { text: transcript })
       const data = response.data
 
       emit('voice-input', {
