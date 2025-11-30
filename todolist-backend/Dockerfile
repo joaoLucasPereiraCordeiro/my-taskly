@@ -1,6 +1,7 @@
+# Base PHP com FPM
 FROM php:8.2-fpm
 
-# Instala dependências do sistema
+# Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -15,22 +16,26 @@ RUN apt-get update && apt-get install -y \
 # Instalar Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
+# Definir diretório de trabalho
 WORKDIR /var/www
 
-# Copiar apenas os arquivos do backend (Dockerfile + .dockerignore cuidam do resto)
+# Copiar apenas backend
 COPY . .
 
 # Instalar dependências do Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# Gerar chave do app
-RUN php artisan key:generate
+# Criar diretórios de cache com permissão
+RUN mkdir -p storage/framework/cache storage/framework/views storage/logs bootstrap/cache && \
+    chmod -R 777 storage bootstrap/cache
 
-# Cache das configs e rotas
-RUN php artisan config:cache && php artisan route:cache
+# Gerar chave e cache de configuração (ignora falhas temporárias)
+RUN php artisan key:generate || true
+RUN php artisan config:cache || true
+RUN php artisan route:cache || true
 
-# Porta exposta
+# Expor porta
 EXPOSE 8000
 
-# Comando para rodar Laravel
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Comando para rodar Laravel no Railway
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
