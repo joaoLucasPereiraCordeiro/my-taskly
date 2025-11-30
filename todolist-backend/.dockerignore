@@ -1,0 +1,9 @@
+# Ignorar node_modules e pastas do frontend
+node_modules
+todolist-frontend
+
+# Ignorar arquivos de cache e logs do Laravel
+storage/framework/cache/*
+storage/framework/views/*
+storage/logs/*
+.env
