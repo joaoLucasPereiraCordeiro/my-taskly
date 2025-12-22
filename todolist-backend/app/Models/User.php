@@ -16,7 +16,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'last_login',
+        'last_login_at',
     ];
 
     protected $hidden = [
@@ -25,9 +25,8 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
+    'email_verified_at' => 'datetime',
+];
 
     public function tasks()
     {
